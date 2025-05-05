@@ -1,0 +1,64 @@
+Task 3:
+Implement a simple text generation algorithm using Markov chains. This task involves creating a statistical model that predicts the probability of a character or word based on the previous one(s).
+
+
+Solution: 
+Markov Chain Text Generator (Word-Level)
+Step-by-step Breakdown:
+Train a model: Create a mapping of each word to possible following words.
+
+Generate text: Use the chain to pick next words probabilistically.
+
+📝 Full Python Code:
+python
+Copy
+Edit
+import random
+
+def build_markov_chain(text, n=1):
+    """
+    Builds a Markov chain as a dictionary.
+    `n` defines the size of the state (n-gram).
+    """
+    words = text.split()
+    markov_chain = {}
+
+    for i in range(len(words) - n):
+        key = tuple(words[i:i+n])
+        next_word = words[i+n]
+        if key not in markov_chain:
+            markov_chain[key] = []
+        markov_chain[key].append(next_word)
+
+    return markov_chain
+
+def generate_text(chain, n=1, max_words=50, seed=None):
+    """
+    Generate text using a Markov chain.
+    """
+    if seed is None:
+        seed = random.choice(list(chain.keys()))
+    output = list(seed)
+
+    for _ in range(max_words - n):
+        state = tuple(output[-n:])
+        next_words = chain.get(state)
+        if not next_words:
+            break
+        next_word = random.choice(next_words)
+        output.append(next_word)
+
+    return ' '.join(output)
+
+# Example usage:
+if __name__ == "__main__":
+    input_text = """
+    The quick brown fox jumps over the lazy dog.
+    The quick red fox leaps over the sleepy cat.
+    The dog barked at the fox that jumped over the cat.
+    """
+
+    n = 1  # Unigram model (current word predicts next)
+    chain = build_markov_chain(input_text, n=n)
+    generated = generate_text(chain, n=n, max_words=30)
+    print("Generated text:\n", generated)
